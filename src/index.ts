@@ -23,7 +23,7 @@ async function main() {
         });
         console.log("database connected");
         app.use(express.json())
-        app.use("/api/cat/", CategoriesController);
+        app.use("/api/", CategoriesController);
 
         app.listen(3000, () => console.log('listening on port 3000'))
     }

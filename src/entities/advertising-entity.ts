@@ -6,7 +6,16 @@ export class AdvertisingEntity extends BaseEntity {
     id: number;
 
     @Column()
-    name: string;
+    title: string;
+
+    @Column()
+    price: string;
+
+    @Column()
+    kilometer: string;
+
+    // @Column()
+    // image: ImageData
 
     @ManyToMany(() => CategoriesEntity)
     @JoinTable({

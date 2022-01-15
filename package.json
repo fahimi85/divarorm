@@ -8,6 +8,7 @@
     "dev": "nodemon --watch ./**/*.ts --exec ts-node src/index.ts"
   },
   "author": "",
+  "types": "dist/*.d.ts",
   "license": "ISC",
   "dependencies": {
     "@types/express": "^4.17.13",
@@ -16,5 +17,9 @@
     "got": "^11.8.3",
     "mssql": "^7.3.0",
     "typeorm": "^0.2.41"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fahimi85/divarorm.git"
   }
 }

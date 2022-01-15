@@ -9,94 +9,144 @@ const router = express.Router();
 app.use(express.json());
 const adservice = new AdvertisingService();
 const categoryservice = new CategoriesService();
+var car: string = ""
+var categorylist = ["buy-old-house", "buy-villa", "buy-apartment", "buy-residential", "auto", "classic-car", "rental-car", "heavy-car", "electronic-devices", "home-kitchen", "services", "personal-goods", "entertainment", "social-services", "tools-materials-equipment", "jobs"]
 
+setInterval(() => {
 
-router.get("/", async (req: Request, res: Response) => {
-    try {
-        // const response = await got(`https://api.divar.ir/v8/web-search/mashhad/car`);
-        // const json = JSON.parse(response.body);
-        var categorylist = ["buy-old-house", "buy-villa", "buy-apartment", "buy-residential", "auto", "car", "classic-car", "rental-car", "heavy-car", "electronic-devices", "home-kitchen", "services", "personal-goods", "entertainment", "social-services", "tools-materials-equipment", "jobs"]
+    router.get("/", async (req: Request, res: Response) => {
+        // deleteLastTable
+
+        var id: number
+        for (id = 1; id < categorylist.length + 1; id++) {
+            await CategoriesEntity.delete(id)
+
+        }
+
         for (var i = 0; i < categorylist.length; i++) {
             let name: string = categorylist[i]
             var cat = new CategoriesEntity();
+            cat.id = i + 1
             cat.name = name;
             await categoryservice.insert(cat);
         }
 
-        // categorylist.forEach(async item => {
-        //     var cat = new CategoriesEntity();
-        //     cat.name = item;
-        //     await categoryservice.insert(cat);
-        // })
-        // const response = await got(`https://api.divar.ir/v8/web-search/mashhad/`);
-        // const json = JSON.parse(response.body);
-        // var main3 = json.schema.ui_schema.category.urischema
-        // var main4 = Object.keys(main3)
-        // console.log(main4)
-        // console.log(json.schema.ui_schema.category.urischema.order)
+        var response2 = await got(`https://api.divar.ir/v8/web-search/mashhad/${categorylist[0]}`);
+        var json = JSON.parse(response2.body);
+        var carlist: { title: string, price: string, kilometer: string, image: ImageData }[] = []
+        json.widget_list.forEach((item: { data: { description: string; title: string; image: ImageData; }; }) => {
 
-        // var main = json.schema.ui_schema.category.urischema.display;
+            var descript = item.data.description
+            var splitpriceANDkilometer: string[] = descript.split(`\n`)
+            var kilometer: string = splitpriceANDkilometer[1];
+            var price: string = splitpriceANDkilometer[0]
+            var carobject = {
+                title: item.data.title,
+                price: (price == undefined) ? "" : price,
+                kilometer: (kilometer == undefined) ? "" : kilometer,
+                image: item.data.image
+            }
 
-        // var main2 = Object.keys(main);
-        // for (let i = 0; i < main2.length; i++) {
-        //     main2[i] = `${i + 1}-${main2[i]}   `
-        // }
+            carlist.push(carobject)
+        });
+        for (i = 0; i < carlist.length; i++) {
+            var advertis = new AdvertisingEntity();
+            advertis.title = carlist[i].title;
+            advertis.price = carlist[i].price;
+            advertis.kilometer = carlist[i].kilometer;
+            // Advertis.image = carobject.image;
 
-        // console.log(main2)
+            await adservice.insert(advertis);
+
+        }
         let main3 = `
         <label for="Category">Please Choose Your Category and enter in the url:</label>
-        <select name="Category" id="Category">`
+        <select name="Category" id="Category" onchange="document.location.href = '/api/' + this.value">`
         for (let i = 0; i < categorylist.length; i++) {
             main3 = main3 + `<option value="${categorylist[i]}">${categorylist[i]}</option>`
         }
         main3 = main3 + `</select>`
+        let Criticalvalue = `<lable>  Critical value</lable><input></input><br><br>`
 
-        res.send(main3);
 
-        // res.send("<b>Please Choose Your Category and enter in the url</b><br>" + main2);
-        // res.send(`<div id="demo">
-        // <h2>The XMLHttpRequest Object</h2>
-        // <button type="button" onclick="loadDoc()">Change Content</button>
-        // </div>
+        car = `<h1> ${categorylist[0]} Shop</h1>`
+        car += "<h2>you can campare and then choosh the best</h2>"
+        car += main3 + Criticalvalue
+        carlist.forEach(item => {
+            car += `<div style="border: 1px solid #FB4805;background-color: #FF5733; margin-bottom: 4px;border-width:3px ;border-radius: 20px;color:white;width:60%;font-size:20px;direction: rtl;display: flex;flex-wrap: wrap;flex-direction: row;justify-content:center;"><div>${item.title}</div><div>${item.price}</div><div>${item.kilometer}</div><div><img src= ${item.image}></div></div>`
+        })
+        car += `</div>`
+        res.send(car);
 
-        // <script>
-        // function loadDoc() {
-        //   const xhttp = new XMLHttpRequest();
-        //   xhttp.onload = function() {
-        //     document.getElementById("demo").innerHTML =
-        //     this.responseText;
-        //   }
-        //   xhttp.open("GET", "ajax_info.txt");
-        //   xhttp.send();
-        // }
-        // </script>`);
 
-    } catch (error) {
-        console.log(error);
-    }
-});
-router.get("/:name", async (req: Request, res: Response) => {
-    try {
+    })
+    router.get("/:name", async (req: Request, res: Response) => {
+        // deleteLastTable
+
+        var id: number
+        for (id = 1; id < categorylist.length + 1; id++) {
+            await CategoriesEntity.delete(id)
+
+        }
+
+        for (var i = 0; i < categorylist.length; i++) {
+            let name: string = categorylist[i]
+            var cat = new CategoriesEntity();
+            cat.id = i + 1
+            cat.name = name;
+            await categoryservice.insert(cat);
+        }
+
         var categor = req.params.name
-        // const response = await got(`https://api.divar.ir/v8/web-search/mashhad/car`);
-        // const json = JSON.parse(response.body);
-        const response = await got(`https://api.divar.ir/v8/web-search/mashhad/${categor}`);
-        // if (!response) {
-        //     res.status(404).send('no such category');
-        // } else {
-        //     const json = JSON.parse(response.body);
-        //     var main = json.schema.json_schema.properties;
-        //     if (main.brand_model) {
-        //         const main2 = main.brand_model.properties.value.items.enum;
-        //         res.send("<b>Please Choose Your Specific Brand and eneter in the url</b><br>" + main2);
-        //     } else {
-        //         res.send("<b>Your Chooosen Category Does Not Have Specific models, for a Beautified api, please enter your category in format like this to start getting your ads</b><br>"
-        //             + `/api/un/${req.params.name}`);
-        //     }
-        // };
-        // const json = JSON.parse(response.body);
-    } catch (error) {
-        console.log(error);
-    }
-});
+        var response2 = await got(`https://api.divar.ir/v8/web-search/mashhad/${categor}`);
+        var json = JSON.parse(response2.body);
+        var carlist: { title: string, price: string, kilometer: string, image: ImageData }[] = []
+        json.widget_list.forEach((item: { data: { description: string; title: string; image: ImageData; }; }) => {
+
+            var descript = item.data.description
+            var splitpriceANDkilometer: string[] = descript.split(`\n`)
+            var kilometer: string = splitpriceANDkilometer[1];
+            var price: string = splitpriceANDkilometer[0]
+            var carobject = {
+                title: item.data.title,
+                price: (price == undefined) ? "" : price,
+                kilometer: (kilometer == undefined) ? "" : kilometer,
+                image: item.data.image
+            }
+            carlist.push(carobject)
+
+        });
+        for (i = 0; i < carlist.length; i++) {
+            var advertis = new AdvertisingEntity();
+            advertis.title = carlist[i].title;
+            advertis.price = carlist[i].price;
+            advertis.kilometer = carlist[i].kilometer;
+            // Advertis.image = carobject.image;
+
+            await adservice.insert(advertis);
+
+        }
+        let main3 = `
+        <label for="Category">Please Choose Your Category and enter in the url:</label>
+        <select name="Category" id="Category" onchange="document.location.href = '/api/' + this.value">`
+        for (let i = 0; i < categorylist.length; i++) {
+            main3 = main3 + `<option value="${categorylist[i]}">${categorylist[i]}</option>`
+        }
+        main3 = main3 + `</select>`
+        let Criticalvalue = `<lable>   Critical value</lable><input></input><br><br>`
+
+
+        car = `<h1> ${categor} Shop</h1>`
+        car += "<h2>you can campare and then choosh the best</h2>"
+        car += main3 + Criticalvalue
+        carlist.forEach(item => {
+            car += `<div style="border: 1px solid #FB4805;background-color: #FF5733; margin-bottom: 4px;border-width:3px ;border-radius: 20px;color:white;width:60%;font-size:20px;direction: rtl;display: flex;flex-wrap: wrap;flex-direction: row;justify-content:center;"><div>${item.title}</div><div>${item.price}</div><div>${item.kilometer}</div><div><img src= ${item.image}></div></div>`
+        })
+        car += `</div>`
+        res.send(car);
+
+
+    })
+
+}, 1000);
 export { router as CategoriesController };
